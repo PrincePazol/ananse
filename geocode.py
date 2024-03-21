@@ -2,6 +2,7 @@
 from arcgis.gis import GIS
 from arcgis.geocoding import geocode
 import streamlit as st
+import time
 
 # Establish connection with agol
 gis = GIS()
@@ -42,3 +43,14 @@ def extract_api(api_response):
     st.info(body='**👻 Submit Some Address Information**')
   # Return the extract data as tuple
   return (latitude, longitude, addr_type, match, score)
+
+# Function to display a toast
+def time_toast():
+  """
+    This function display toast.
+  """
+  st.toast(body='Appreciate You', icon='🥂')
+  time.sleep(.5)
+  st.toast(body='Happy Geocoding', icon='🚀')
+  time.sleep(.5)
+  st.toast(body='Ananse', icon='🕸️')

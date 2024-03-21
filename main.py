@@ -5,7 +5,7 @@ from arcgis.geocoding import geocode
 import folium
 from streamlit_folium import st_folium
 from streamlit_lottie import st_lottie
-from geocode import arcgis_geocode, extract_api
+from geocode import arcgis_geocode, extract_api, time_toast
 
 # Initialize the App
 st.set_page_config(page_title='Ananse', page_icon='🕸️')
@@ -59,6 +59,11 @@ st.write('Your Address Coordinates')
 latitude = extract_data[0]
 longitude = extract_data[1]
 score = extract_data[-1]
+# Handle Errors
+try:
+  address = api_response[0]['address']
+except IndexError:
+  address = ''
 
 # Create the container
 with st.container(border=True):
@@ -92,29 +97,33 @@ with st.container(border=True):
 # Add a divider
 st.divider()
 
-# Add a map
-# Handle ValueError
-try:
-  m = folium.Map(location=[latitude, longitude],
-                zoom_start=16
-                )
-except ValueError:
-    st.info(body='Map Display Here', icon='👻')
+# Add an expander
+with st.expander(label='**See Map**', expanded=True):
+  # Handle ValueError
+  try:
+    # Add a map
+    m = folium.Map(location=[latitude, longitude],
+                  zoom_start=16
+                  )
+  except ValueError:
+      st.info(body='Map Display Here', icon='👻')
 
-# Handle Value Error
-try:
-  # Show the point on the map
-  folium.Marker(
-                [latitude, longitude],
-                popup=user_input,
-                tooltip=api_response[0]['address']
-               ).add_to(m)
-except ValueError:
-  pass
+  # Handle Value Error
+  try:
+    # Show the point on the map
+    folium.Marker(
+                  [latitude, longitude],
+                  popup=user_input,
+                  tooltip=address
+                ).add_to(m)
+  except ValueError:
+    pass
 
-# Handle NameError
-try:  
-  # Display the map
-  st_data = st_folium(m, width=600)
-except NameError:
-  pass
+  # Handle NameError
+  try:  
+    # Display the map
+    st_data = st_folium(m, width=600)
+    # Show Toast 
+    time_toast()
+  except NameError:
+    pass
